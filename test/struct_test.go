@@ -76,3 +76,53 @@ func TestAreaAndRectangleByInterfaceSUCCESS(t *testing.T) {
 		checkArea(t, circle, 314.1592653589793)
 	})
 }
+
+func TestAreaAndRectangleByInterfaceFAIL(t *testing.T) {
+	checkArea := func(t testing.TB, shape logic.Shape, want float64) {
+		t.Helper()
+		got := shape.Area()
+		assert.NotEqual(t, want, got)
+	}
+
+	t.Run("circles", func(t *testing.T) {
+		circle := logic.Circle{Radius: 15}
+		checkArea(t, circle, 123.1592653589793)
+	})
+
+	t.Run("rectangle", func(t *testing.T) {
+		rectangle := logic.Rectangle{Width: 12, Height: 6}
+		checkArea(t, rectangle, 22.0)
+	})
+}
+
+func TestAreaAndRectangleBatchSUCCESS(t *testing.T) {
+	areaTest := []struct {
+		shape logic.Shape
+		want  float64
+	}{
+		{logic.Rectangle{Width: 12, Height: 6}, 72.0},
+		{logic.Circle{Radius: 10}, 314.1592653589793},
+	}
+
+	for _, tt := range areaTest {
+		got := tt.shape.Area()
+
+		assert.NotEmpty(t, areaTest)
+		assert.Equal(t, tt.want, got)
+	}
+}
+
+func TestAreaAndRectangleBatchFAIL(t *testing.T) {
+	areaTest := []struct {
+		shape logic.Shape
+		want  float64
+	}{
+		{logic.Rectangle{Width: 12, Height: 6}, 12.0},
+		{logic.Circle{Radius: 1}, 314.1592653589793},
+	}
+
+	for _, tt := range areaTest {
+		got := tt.shape.Area()
+		assert.NotEqual(t, tt.want, got)
+	}
+}
