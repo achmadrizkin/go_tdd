@@ -74,3 +74,61 @@ func TestCountdownLoopFAILBecauseWrongValue(t *testing.T) {
 
 	assert.NotEqual(t, want, got)
 }
+
+func TestCountdownSleepSUCCESS(t *testing.T) {
+	buffer := &bytes.Buffer{} // bit val
+	spySleeper := &SpySleeper{}
+
+	logic.CountdownSleeper(buffer, spySleeper)
+
+	got := buffer.String()
+	want := `3
+2
+1
+Go!`
+
+	if got != want {
+		t.Errorf("got %q want %q", got, want)
+	}
+
+	// this delay come from mocking.go
+	if spySleeper.Calls != 3 {
+		t.Errorf("not enough calls to sleeper, want 3 got %d", spySleeper.Calls)
+	}
+
+	assert.Equal(t, want, got)
+	assert.Equal(t, 3, spySleeper.Calls)
+}
+
+func TestCountdownSleepFAIL(t *testing.T) {
+	buffer := &bytes.Buffer{} // bit val
+	spySleeper := &SpySleeper{}
+
+	logic.CountdownSleeper(buffer, spySleeper)
+
+	got := buffer.String()
+	want := `3
+2
+1
+Go!`
+
+	if got != want {
+		t.Errorf("got %q want %q", got, want)
+	}
+
+	assert.Equal(t, want, got)
+	assert.NotEqual(t, 3, spySleeper.FailedCalls) // expected: 3, got: 6
+}
+
+type SpySleeper struct {
+	Calls       int
+	FailedCalls int
+}
+
+func (s *SpySleeper) Sleep() {
+	s.Calls++
+}
+
+func (s *SpySleeper) SleepFAIL() {
+	s.FailedCalls += 2
+}
