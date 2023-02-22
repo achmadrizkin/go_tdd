@@ -58,3 +58,21 @@ func TestAreaAndRectangleSUCCESS(t *testing.T) {
 		assert.Equal(t, want, got)
 	})
 }
+
+func TestAreaAndRectangleByInterfaceSUCCESS(t *testing.T) {
+	checkArea := func(t testing.TB, shape logic.Shape, want float64) {
+		t.Helper()
+		got := shape.Area()
+		assert.Equal(t, want, got)
+	}
+
+	t.Run("rectangle", func(t *testing.T) {
+		rectangle := logic.Rectangle{Width: 12, Height: 6}
+		checkArea(t, rectangle, 72.0)
+	})
+
+	t.Run("circles", func(t *testing.T) {
+		circle := logic.Circle{Radius: 10}
+		checkArea(t, circle, 314.1592653589793)
+	})
+}
