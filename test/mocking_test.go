@@ -3,6 +3,7 @@ package test
 import (
 	"bytes"
 	logic "go_tdd/logic"
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -100,6 +101,49 @@ Go!`
 	assert.Equal(t, 3, spySleeper.Calls)
 }
 
+// test sleep between print (success)
+func TestCountdownBetweenPrintSUCCESS(t *testing.T) {
+	t.Run("sleep in-between the prints", func(t *testing.T) {
+		spySleepPrinter := &SpyCountdownOperations{}
+		logic.CountdownSleeper(spySleepPrinter, spySleepPrinter)
+
+		want := []string{
+			write,
+			sleep,
+			write,
+			sleep,
+			write,
+			sleep,
+			write,
+		}
+
+		if !reflect.DeepEqual(want, spySleepPrinter.Calls) {
+			t.Errorf("wanted calls %v got %v", want, spySleepPrinter.Calls)
+		}
+
+		assert.Equal(t, want, spySleepPrinter.Calls)
+	})
+}
+
+func TestCountdownBetweenPrintFAIL(t *testing.T) {
+	t.Run("sleep in-between the prints", func(t *testing.T) {
+		spySleepPrinter := &SpyCountdownOperations{}
+		logic.CountdownSleeper(spySleepPrinter, spySleepPrinter)
+
+		want := []string{
+			write,
+			sleep,
+			write,
+			sleep,
+			write,
+			sleep,
+			write,
+		}
+
+		assert.NotEqual(t, want, spySleepPrinter.FailedCalls) // got: sleep, write, sleep, etc
+	})
+}
+
 func TestCountdownSleepFAIL(t *testing.T) {
 	buffer := &bytes.Buffer{} // bit val
 	spySleeper := &SpySleeper{}
@@ -120,6 +164,22 @@ Go!`
 	assert.NotEqual(t, 3, spySleeper.FailedCalls) // expected: 3, got: 6
 }
 
+type SpyCountdownOperations struct {
+	Calls       []string
+	FailedCalls []string
+}
+
+func (s *SpyCountdownOperations) Sleep() {
+	s.Calls = append(s.Calls, sleep)
+	s.FailedCalls = append(s.FailedCalls, write)
+}
+
+func (s *SpyCountdownOperations) Write(p []byte) (n int, err error) {
+	s.Calls = append(s.Calls, write)
+	s.FailedCalls = append(s.FailedCalls, sleep)
+	return
+}
+
 type SpySleeper struct {
 	Calls       int
 	FailedCalls int
@@ -132,3 +192,6 @@ func (s *SpySleeper) Sleep() {
 func (s *SpySleeper) SleepFAIL() {
 	s.FailedCalls += 2
 }
+
+const write = "write"
+const sleep = "sleep"
