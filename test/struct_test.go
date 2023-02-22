@@ -126,3 +126,51 @@ func TestAreaAndRectangleBatchFAIL(t *testing.T) {
 		assert.NotEqual(t, tt.want, got)
 	}
 }
+
+func TestAreaRectangleAndTriangleBatchSUCCESS(t *testing.T) {
+	areaTest := []struct {
+		name  string
+		shape logic.Shape
+		want  float64
+	}{
+		{name: "Rectangle", shape: logic.Rectangle{Width: 12, Height: 6}, want: 72.0},
+		{name: "Circle", shape: logic.Circle{Radius: 10}, want: 314.1592653589793},
+		{name: "Triangle", shape: logic.Triangle{Base: 12, Height: 6}, want: 36.0},
+	}
+
+	for _, tt := range areaTest {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.shape.Area()
+
+			if got != tt.want {
+				t.Errorf("%#v got %g want %g", tt.shape, got, tt.want)
+			}
+
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestAreaRectangleAndTriangleBatchFAIL(t *testing.T) {
+	areaTest := []struct {
+		name  string
+		shape logic.Shape
+		want  float64
+	}{
+		{name: "Rectangle", shape: logic.Rectangle{Width: 35, Height: 6}, want: 72.0},
+		{name: "Circle", shape: logic.Circle{Radius: 750}, want: 314.1592653589793},
+		{name: "Triangle", shape: logic.Triangle{Base: 132, Height: 6}, want: 36.0},
+	}
+
+	for _, tt := range areaTest {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.shape.Area()
+
+			if got != tt.want {
+				t.Logf("%#v got %g want %g", tt.shape, got, tt.want)
+			}
+
+			assert.NotEqual(t, tt.want, got)
+		})
+	}
+}
